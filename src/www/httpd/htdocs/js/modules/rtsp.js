@@ -138,7 +138,7 @@ APP.rtsp = (function ($) {
         $.ajax({
             type: "POST",
             url: 'cgi-bin/set_configs.sh?conf=viewd',
-            data: configs,
+            data: JSON.stringify(configs),
             dataType: "json",
             success: function(response) {
                 saveStatusElem.text("Saved");
@@ -152,7 +152,7 @@ APP.rtsp = (function ($) {
         $.ajax({
             type: "POST",
             url: 'cgi-bin/set_configs.sh?conf=system',
-            data: configsSystem,
+            data: JSON.stringify(configsSystem),
             dataType: "json",
             success: function(response) {
             },

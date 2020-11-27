@@ -25,7 +25,7 @@ APP.configurations = (function ($) {
                 loadingStatusElem.fadeOut(500);
                 
                 $.each(response, function (key, state) {
-                    if(key=="HOSTNAME")
+                    if(key=="HOSTNAME" || key=="TIMEZONE")
                         $('input[type="text"][data-key="' + key +'"]').prop('value', state);
                     else
                         $('input[type="checkbox"][data-key="' + key +'"]').prop('checked', state === 'yes');
@@ -50,6 +50,7 @@ APP.configurations = (function ($) {
         });
         
         configs["HOSTNAME"] = $('input[type="text"][data-key="HOSTNAME"]').prop('value');
+		configs["TIMEZONE"] = $('input[type="text"][data-key="TIMEZONE"]').prop('value');
         
         if(!validateHostname(configs["HOSTNAME"]))
         {
@@ -57,11 +58,15 @@ APP.configurations = (function ($) {
             alert("Hostname not valid!");
             return;
         }
+       
+        var configData = JSON.stringify(configs);
+        var escapedConfigData = configData.replace(/\\/g,  "\\")
+                                          .replace(/\\"/g, '\\"');
 
         $.ajax({
             type: "POST",
             url: 'cgi-bin/set_configs.sh?conf=system',
-            data: configs,
+            data: escapedConfigData,
             dataType: "json",
             success: function(response) {
                 saveStatusElem.text("Saved");

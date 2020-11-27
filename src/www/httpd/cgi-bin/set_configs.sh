@@ -16,6 +16,10 @@ get_conf_type()
     fi
 }
 
+sedencode(){
+  echo -e "$(sed 's/\\/\\\\\\/g;s/\&/\\\&/g;s/\//\\\//g;')"
+}
+
 CONF_TYPE="$(get_conf_type)"
 CONF_FILE=""
 
@@ -27,10 +31,10 @@ fi
 
 read POST_DATA
 
-PARAMS=$(echo "$POST_DATA" | tr "&" " ")
+PARAMS=$(echo "$POST_DATA" | tr "\n\r" " " | tr -d " " | sed 's/{\"//g' | sed 's/\"}//g' | sed 's/\",\"/ /g')
 
 for S in $PARAMS ; do
-    PARAM=$(echo "$S" | tr "=" " ")
+    PARAM=$(echo "$S" | sed 's/\":\"/ /g')
     KEY=""
     VALUE=""
     
@@ -47,6 +51,7 @@ for S in $PARAMS ; do
             echo "$VALUE" > /etc/hostname
         fi
     else
+	    VALUE=$(echo "$VALUE" | sedencode)
         sed -i "s/^\(${KEY}\s*=\s*\).*$/\1${VALUE}/" $CONF_FILE
     fi   
 done
